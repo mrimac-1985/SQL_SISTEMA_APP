@@ -150,6 +150,15 @@ INSERT INTO   public.usuario(  nidusuario, bactivo,  dfechareg,  nidsesion,  slo
 VALUES ( 4, TRUE,  NOW(), 1 ,  'ROOT',  '123');
 
 
+/*USAURIO AREA*/
+INSERT INTO   public.usuario_area(  bactivo,  dfechareg,  nidsesion,  sobservacion,  nidarea,  nidusuario)
+  VALUES (	TRUE,  NOW(),  1,  '',  1,  1);
+
+INSERT INTO   public.usuario_area(  bactivo,  dfechareg,  nidsesion,  sobservacion,  nidarea,  nidusuario)
+  VALUES (	TRUE,  NOW(),  1,  '',  1,  2);
+
+
+
 
 
 /*USUARIO ROL*/
@@ -157,10 +166,20 @@ INSERT INTO   public.usuario_rol(    bactivo,  dfechareg,  nidsesion,  sobservac
 VALUES (   TRUE,  NOW(),  1,  '',  1, 1 );
 
 
+
+
 /*PERFIL*/
 
 INSERT INTO   public.perfil(   bactivo,  dfechareg,  nidsesion,  nsesionesporusuario,  ntiempoconexionminuto,  ntiempovidapasworddia,  snombreperfil)
 VALUES (    true,  NOW(),  1,  '3',  100,  3,  'SUPER USUARIO');
+
+INSERT INTO   public.perfil(   bactivo,  dfechareg,  nidsesion,  nsesionesporusuario,  ntiempoconexionminuto,  ntiempovidapasworddia,  snombreperfil)
+VALUES (    true,  NOW(),  1,  '1',  100,  30,  'Contabilidad');
+
+INSERT INTO   public.perfil(   bactivo,  dfechareg,  nidsesion,  nsesionesporusuario,  ntiempoconexionminuto,  ntiempovidapasworddia,  snombreperfil)
+VALUES (    true,  NOW(),  1,  '1',  100,  30,  'Ventas');
+
+
 
 
 /*USURIO PERFIL*/
@@ -169,9 +188,11 @@ VALUES (    TRUE,  NOW(),  1,  'Perfil de super usuario',  1,  1);
 
 
 
+
 /*PARAMETROS*/
 INSERT INTO  public.parametro(  bactivo,  dfechareg,  sclave,  sdescripcion,  svalor)
 VALUES (  true,  now(),  'NOMB_TIENDA',  'Nombre de la tienda',  'SISTEMA DE VENTAS');
+
 
 
 

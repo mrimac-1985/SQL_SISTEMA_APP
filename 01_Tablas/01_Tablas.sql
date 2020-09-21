@@ -1,4 +1,4 @@
-
+--tablas
 
 create table oauth_access_token (
   token_id VARCHAR(256),
