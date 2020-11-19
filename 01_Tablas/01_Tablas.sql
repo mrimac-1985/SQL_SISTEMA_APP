@@ -60,6 +60,7 @@ CREATE TABLE public.operador (
 	snombre varchar(80) NOT NULL,
 	sapepaterno varchar(80) NOT NULL,	
 	sapematerno varchar(80) NOT NULL,
+	scorreo varchar(80) NOT NULL,
 	sgenero varchar(1) NOT NULL,
 	dfechanac date NOT NULL,
 	sobservacion varchar(500) NULL,
@@ -268,7 +269,7 @@ CREATE TABLE public.usuario_biometria (
 	nidusuariobiometria serial NOT NULL,	
 	nidusuario int4 NOT NULL,
 	stipoimagen varchar(25) NOT NULL,
-	ximagen bytea NOT NULL,	
+	ximagen bytea NULL,	
 	bactivo bool NOT NULL,
 	dfechareg timestamp NOT NULL,
 	nidsesion int4 NULL,
@@ -325,12 +326,12 @@ CREATE TABLE public.usuario_rol (
 
 CREATE TABLE public.sesion (
 	nidsesion serial NOT NULL,
-	bactivo bool NOT NULL,
-	dfechafin date NULL,
-	dfechainicio date NOT NULL,
-	dfechareg timestamp NOT NULL,
+	dfechainicio timestamp NOT NULL,
+	dfechafin timestamp NULL,
 	ssistemaversion varchar(50) NOT NULL,
 	nidusuario int4 NOT NULL,
+	dfechareg timestamp NOT NULL,
+	bactivo bool NOT NULL,
 	CONSTRAINT pk_sesion PRIMARY KEY (nidsesion),
 	CONSTRAINT fk_sesion_nidusuario_usuario_nidusuario FOREIGN KEY (nidusuario) REFERENCES usuario(nidusuario)
 );
