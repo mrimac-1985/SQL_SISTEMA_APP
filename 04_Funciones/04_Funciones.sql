@@ -297,7 +297,6 @@ $function$
 
 
 
-
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 
@@ -321,7 +320,6 @@ BEGIN
 END
 $function$
 ;
-
 
 
 
@@ -362,9 +360,6 @@ $function$
 
 
 
-
-
-
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 
@@ -380,7 +375,817 @@ $function$
 ;
 
 
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
+--**FUNCION INSERTAR OPERADOR****************
+DROP FUNCTION IF EXISTS fn_insertar_operador_usuario;
+
+CREATE FUNCTION public.fn_insertar_operador_usuario (
+	p_fechanac operador.dfechanac%TYPE,
+	p_idsesion operador.nidsesion%TYPE,
+	p_apematerno operador.sapematerno%TYPE,
+	p_apepaterno operador.sapepaterno%TYPE,
+	p_genero operador.sgenero%TYPE,
+	p_nombre operador.snombre%TYPE,
+	p_numdocu operador.snumdocu%TYPE,
+	p_observacion operador.sobservacion%TYPE,
+	p_login usuario.slogin%TYPE,
+	p_password usuario.spassword%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_nidoperador operador.nidoperador%type;
+BEGIN
+	BEGIN
+		INSERT INTO public.operador
+		(bactivo, dfechanac, dfechareg, nidsesion, sapematerno, sapepaterno, sgenero, snombre, snumdocu, sobservacion)
+		VALUES(true, p_fechanac, now(), p_idsesion, p_apematerno, p_apepaterno, p_genero, p_nombre, p_numdocu, p_observacion)
+		RETURNING nidoperador INTO v_nidoperador;
+	
+		INSERT INTO public.usuario
+		(nidusuario, bactivo, dfechareg, nidsesion, slogin, spassword)
+		VALUES(v_nidoperador, true, now(), p_idsesion, p_login, p_password);
+		
+	
+		v_respuesta	:= 'Se insertó registro Operador correctamente';	
+	EXCEPTION 
+		WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_operador_usuario --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_operador_usuario --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
 
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+
+--**FUNCION UPDATE OPERADOR USUARIO****************
+DROP FUNCTION IF EXISTS fn_actualizar_operador_usuario;
+
+CREATE FUNCTION public.fn_actualizar_operador_usuario(
+	p_idoperador operador.nidoperador%TYPE,
+	p_fechanac operador.dfechanac%TYPE,
+	p_idsesion operador.nidsesion%TYPE,
+	p_apematerno operador.sapematerno%TYPE,
+	p_apepaterno operador.sapepaterno%TYPE,
+	p_genero operador.sgenero%TYPE,
+	p_nombre operador.snombre%TYPE,
+	p_numdocu operador.snumdocu%TYPE,
+	p_observacion operador.sobservacion%TYPE,
+	p_login usuario.slogin%TYPE,
+	p_password usuario.spassword%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_operador operador%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM operador
+		INTO v_operador
+		WHERE nidoperador = p_idoperador;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Operador en el registro';
+		ELSE
+		/*ACTUALIZA OPERADOR*/
+		UPDATE public.operador
+		SET dfechanac= p_fechanac, nidsesion= p_idsesion , sapematerno= p_apematerno, sapepaterno= p_apepaterno, 
+			sgenero= p_genero, snombre= p_nombre, snumdocu= p_numdocu, sobservacion= p_observacion
+		WHERE nidoperador= p_idoperador;
+		/*ACTUALIZA USUARIO*/	
+		UPDATE public.usuario
+		SET nidsesion= p_idsesion, slogin= p_login, spassword= p_password
+		WHERE nidusuario= p_idoperador;
+	
+		v_respuesta	:= 'Se actualizó registro Operador correctamente';
+		END IF;
+	EXCEPTION
+		WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_operador --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_operador_usuario --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+
+--*****FUNCTION ELIMINAR OPERADOR*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_operador;
+
+CREATE FUNCTION public.fn_eliminar_operador (
+	p_nidoperador operador.nidoperador%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_operador operador%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM operador
+		INTO v_operador
+		WHERE nidoperador = p_nidoperador;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Operador en el registro';
+		ELSE
+			UPDATE 
+				public.operador
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidoperador = p_nidoperador;
+			/*ELIMINA USUARIO*/
+			UPDATE 
+				public.usuario
+			SET	
+				bactivo = FALSE
+			WHERE 
+				nidusuario = p_nidoperador;
+			
+			v_respuesta	:= 'Se eliminó correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_operador --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_operador --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--FUNCTION INSERT AREA------------------
+DROP FUNCTION IF EXISTS fn_insertar_area;
+
+CREATE FUNCTION public.fn_insertar_area (
+	p_idsesion area.nidsesion%TYPE,	
+	p_nombre area.snombre%TYPE,
+	p_sobservacion area.sobservacion%TYPE,
+	p_idsede area.nidsede%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;	
+BEGIN
+	BEGIN
+		INSERT INTO public.area (bactivo, dfechareg, nidsesion, snombre, sobservacion, nidsede)
+		VALUES(TRUE, now(), p_idsesion, p_nombre, p_sobservacion, p_idsede);
+
+		v_respuesta	:= 'Se insertó registro Area correctamente';	
+	EXCEPTION 
+		WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_area --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_area --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--***FUNCTION UPDATE AREA******************************
+
+DROP FUNCTION IF EXISTS fn_actualizar_area;
+
+CREATE FUNCTION public.fn_actualizar_area (
+	p_idarea area.nidarea%TYPE,
+	p_idsesion area.nidsesion%TYPE,	
+	p_nombre area.snombre%TYPE,
+	p_sobservacion area.sobservacion%TYPE,
+	p_idsede area.nidsede%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_area area%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM area
+		INTO v_area
+		WHERE nidarea = p_idarea;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Area en el registro';
+		ELSE
+			UPDATE 
+				public.area 
+			SET 
+				nidsesion= p_idsesion, 
+				snombre = p_nombre, 
+				sobservacion= p_observacion, 
+				nidsede = p_idsede
+			WHERE 
+				nidarea = p_idarea;
+			
+			v_respuesta	:= 'Se realizó la actualización de Area';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_area --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_area --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--*****FUNCTION ELIMINAR AREA*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_area;
+
+CREATE FUNCTION public.fn_eliminar_area(
+	p_idarea area.nidarea%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_area area%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM area
+		INTO v_area
+		WHERE nidarea = p_idarea;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Area en el registro';
+		ELSE
+			UPDATE 
+				public.area
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidarea = p_idarea;			
+			v_respuesta	:= 'Se eliminó Area correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_area --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_area --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--FUNCTION INSERTAR SEDE------------------
+DROP FUNCTION IF EXISTS fn_insertar_sede;
+
+CREATE FUNCTION public.fn_insertar_sede (
+	p_direccion sede.sdireccion%TYPE,	
+	p_nombre sede.snombre%TYPE,
+	p_ubigeo sede.subigeo%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;	
+BEGIN
+	BEGIN
+		INSERT INTO public.sede (bactivo, dfechareg, sdireccion, snombre, subigeo)
+		VALUES(true, now(), p_direccion, p_nombre, p_ubigeo);
+
+		v_respuesta	:= 'Se insertó registro Sede correctamente';	
+	EXCEPTION 
+		WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_sede --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_sede --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--***FUNCTION UPDATE SEDE******************************
+
+DROP FUNCTION IF EXISTS fn_actualizar_sede;
+
+CREATE FUNCTION public.fn_actualizar_sede (
+	p_idsede sede.nidsede%TYPE,
+	p_direccion sede.sdireccion%TYPE,	
+	p_nombre sede.snombre%TYPE,
+	p_subigeo sede.subigeo%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_sede sede%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM sede
+		INTO v_sede
+		WHERE nidsede = p_idsede;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Sede en el registro';
+		ELSE
+			UPDATE 
+				public.sede
+			SET 
+				sdireccion = p_direccion, 
+				snombre = p_nombre, 
+				subigeo = p_subigeo
+			WHERE 
+				nidsede = p_idsede;
+			
+			v_respuesta	:= 'Se realizó la actualización de Sede';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_sede --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_sede --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--*****FUNCTION ELIMINAR SEDE*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_sede;
+
+CREATE FUNCTION public.fn_eliminar_sede(
+	p_idsede sede.nidsede%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_sede sede%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM sede
+		INTO v_sede
+		WHERE nidsede = p_idsede;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Sede en el registro';
+		ELSE
+			UPDATE 
+				public.sede
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidsede = p_idsede;			
+			v_respuesta	:= 'Se eliminó Sede correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_sede --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_sede --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--FUNCTION INSERT ROL------------------
+DROP FUNCTION IF EXISTS fn_insertar_rol;
+
+CREATE FUNCTION public.fn_insertar_rol (
+	p_nidsesion rol.nidsesion%TYPE,
+	p_siglas rol.siglas%TYPE,
+	p_snombrerol rol.snombrerol%TYPE,
+	p_sobservacion rol.sobservacion%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;	
+BEGIN
+	BEGIN
+		INSERT INTO public.rol (bactivo, dfechareg, nidsesion, siglas, snombrerol, sobservacion)
+		VALUES(true, now(), p_nidsesion, p_siglas, p_snombrerol, p_sobservacion);
+
+		v_respuesta	:= 'Se insertó registro Rol correctamente';	
+	EXCEPTION 
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_rol --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--***FUNCTION UPDATE******************************
+
+DROP FUNCTION IF EXISTS fn_actualizar_rol;
+
+CREATE FUNCTION public.fn_actualizar_rol (
+	p_nidrol rol.nidrol%TYPE,
+	p_nidsesion rol.nidsesion%TYPE,
+	p_siglas rol.siglas%TYPE,
+	p_snombrerol rol.snombrerol%TYPE,
+	p_sobservacion rol.sobservacion%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_rol rol%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM rol
+		INTO v_rol
+		WHERE nidrol = p_nidrol;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Rol en el registro';
+		ELSE
+			UPDATE 
+				public.rol 
+			SET 
+				nidsesion= p_nidsesion, 
+				siglas= p_siglas, 
+				snombrerol= p_snombrerol, 
+				sobservacion= p_sobservacion
+			WHERE 
+				nidrol = p_nidrol;
+			
+			v_respuesta	:= 'Se realizó la actualización de Rol';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_rol --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_rol --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--*****FUNCTION ELIMINAR ROL*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_rol;
+
+CREATE FUNCTION public.fn_eliminar_rol (
+	p_nidrol rol.nidrol%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$ 
+DECLARE 
+	v_respuesta varchar;
+	v_rol rol%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM rol
+		INTO v_rol
+		WHERE nidrol = p_nidrol;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Rol en el registro';
+		ELSE
+			UPDATE 
+				public.rol 
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidrol = p_nidrol;			
+			v_respuesta	:= 'Se eliminó correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_rol --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_rol --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--**FUNCION INSERTAR PERFIL*************
+
+DROP FUNCTION IF EXISTS fn_insertar_perfil;
+
+CREATE FUNCTION public.fn_insertar_perfil (
+	p_idsesion perfil.nidsesion%TYPE,
+	p_sesionesporusuario perfil.nsesionesporusuario%TYPE,
+	p_tiempoconexion perfil.ntiempoconexionminuto%TYPE,
+	p_tiempovidapasword perfil.ntiempovidapasworddia%TYPE,
+	p_nombreperfil perfil.snombreperfil%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;	
+BEGIN
+	BEGIN
+		INSERT INTO public.perfil (bactivo, dfechareg, nidsesion, nsesionesporusuario, ntiempoconexionminuto, ntiempovidapasworddia, snombreperfil)
+		VALUES(true, now(), p_idsesion, p_sesionesporusuario, p_tiempoconexion, p_tiempovidapasword, p_nombreperfil);
+
+		v_respuesta	:= 'Se insertó registro Perfil correctamente';	
+	EXCEPTION 
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_perfil --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--***FUNCTION UPDATE PERFIL******************************
+
+DROP FUNCTION IF EXISTS fn_actualizar_perfil;
+
+CREATE FUNCTION public.fn_actualizar_perfil (
+	p_idperfil perfil.nidperfil%TYPE,
+	p_idsesion rol.nidsesion%TYPE,
+	p_sesionesporusuario perfil.nsesionesporusuario%TYPE,
+	p_tiempoconexion perfil.ntiempoconexionminuto%TYPE,
+	p_tiempovidapasword perfil.ntiempovidapasworddia%TYPE,
+	p_nombreperfil perfil.snombreperfil%type
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_perfil perfil%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM perfil
+		INTO v_perfil
+		WHERE nidperfil = p_idperfil;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Perfil en el registro';
+		ELSE
+			UPDATE 
+				public.perfil 
+			SET 
+				nidsesion = p_idsesion, 
+				nsesionesporusuario = p_sesionesporusuario, 
+				ntiempoconexionminuto = p_tiempoconexion, 
+				ntiempovidapasworddia = p_tiempovidapasword,
+				snombreperfil = p_nombreperfil
+			WHERE 
+				nidperfil = p_idperfil;
+			
+			v_respuesta	:= 'Se realizó la actualización de Perfil';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_perfil --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_perfil --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--*****FUNCTION ELIMINAR PERFIL*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_perfil;
+
+CREATE FUNCTION public.fn_eliminar_perfil (
+	p_idperfil perfil.nidperfil%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_perfil perfil%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM perfil
+		INTO v_perfil
+		WHERE nidperfil = p_idperfil;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id perfil en el registro';
+		ELSE
+			UPDATE 
+				public.perfil
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidperfil = p_idperfil;			
+			v_respuesta	:= 'Se eliminó perfil correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_perfil --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_perfil --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--FUNCTION INSERT MODULO------------------
+
+DROP FUNCTION IF EXISTS fn_insertar_modulo;
+
+CREATE FUNCTION public.fn_insertar_modulo (
+	p_nidsesion modulo.nidsesion%TYPE,
+	p_nombremodulo modulo.snombremodulo%TYPE,
+	p_observacion modulo.sobservacion%TYPE,
+	p_siglas modulo.ssiglas%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;	
+BEGIN
+	BEGIN
+		INSERT INTO	public.modulo (bactivo, dfechareg, nidsesion, snombremodulo, sobservacion, ssiglas)
+		VALUES(TRUE, now(), p_nidsesion, p_nombremodulo, p_observacion, p_siglas);
+
+		v_respuesta	:= 'Se insertó registro Modulo correctamente';	
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_modulo --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_insertar_modulo --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--***FUNCTION UPDATE MODULO******************************
+
+DROP FUNCTION IF EXISTS fn_actualizar_modulo;
+
+CREATE FUNCTION public.fn_actualizar_modulo (
+	p_idmodulo modulo.nidmodulo%TYPE,
+	p_idsesion modulo.nidsesion%TYPE,
+	p_nombremodulo modulo.snombremodulo%TYPE,
+	p_observacion modulo.sobservacion%TYPE,
+	p_siglas modulo.ssiglas%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_modulo modulo%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM modulo
+		INTO v_modulo
+		WHERE nidmodulo = p_idmodulo;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Modulo en el registro';
+		ELSE
+		UPDATE
+			public.modulo
+		SET
+			nidsesion = p_idsesion,
+			snombremodulo = p_nombremodulo,
+			sobservacion = p_observacion,
+			ssiglas = p_siglas
+		WHERE
+		nidmodulo = p_idmodulo;
+
+			v_respuesta	:= 'Se realizó la actualización de Modulo';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_actualizar_modulo --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_actualizar_modulo --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+--*****FUNCTION ELIMINAR MODULO*******
+DROP FUNCTION IF EXISTS public.fn_eliminar_modulo;
+
+CREATE FUNCTION public.fn_eliminar_modulo (
+	p_idmodulo modulo.nidmodulo%TYPE
+)
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS 
+$function$
+DECLARE 
+	v_respuesta varchar;
+	v_modulo modulo%rowtype;
+BEGIN
+	BEGIN
+		SELECT * FROM modulo
+		INTO v_modulo
+		WHERE nidmodulo = p_idmodulo;
+	
+		IF NOT FOUND THEN
+			v_respuesta = 'No se encontro id Modulo en el registro';
+		ELSE
+			UPDATE 
+				public.modulo
+			SET
+				bactivo = FALSE
+			WHERE 
+				nidmodulo = p_idmodulo;			
+			v_respuesta	:= 'Se eliminó Modulo correctamente';
+		END IF;
+	EXCEPTION 
+		 WHEN NO_DATA_FOUND THEN 
+		 v_respuesta := 'No se encontró registro en la funcion fn_eliminar_modulol --'||SUBSTR(SQLERRM,1,200);
+		 WHEN OTHERS THEN 
+		 v_respuesta := 'Error en fn_eliminar_modulo --'||SUBSTR(SQLERRM,1,200);
+	END;
+	RETURN v_respuesta;
+END
+$function$
+;
+
+
