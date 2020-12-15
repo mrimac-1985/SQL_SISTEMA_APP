@@ -63,6 +63,7 @@ CREATE TABLE public.operador (
 	scorreo varchar(80) NOT NULL,
 	sgenero varchar(1) NOT NULL,
 	dfechanac date NOT NULL,
+	sdireccion varchar(500) NULL,
 	sobservacion varchar(500) NULL,
 	bactivo bool NOT NULL,
 	dfechareg timestamp NOT NULL,

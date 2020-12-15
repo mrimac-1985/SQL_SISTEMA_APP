@@ -375,9 +375,11 @@ $function$
 ;
 
 
+
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
---**FUNCION INSERTAR OPERADOR****************
+
+/--**FUNCION INSERTAR OPERADOR****************
 DROP FUNCTION IF EXISTS fn_insertar_operador_usuario;
 
 CREATE FUNCTION public.fn_insertar_operador_usuario (
@@ -390,7 +392,11 @@ CREATE FUNCTION public.fn_insertar_operador_usuario (
 	p_numdocu operador.snumdocu%TYPE,
 	p_observacion operador.sobservacion%TYPE,
 	p_login usuario.slogin%TYPE,
-	p_password usuario.spassword%type
+	p_password usuario.spassword%TYPE,
+	
+	p_nidperfil usuario_perfil.nidperfil%TYPE, 
+	p_nidarea usuario_area.nidarea%TYPE,
+	p_nidrol usuario_rol.nidrol%TYPE
 )
  RETURNS varchar
  LANGUAGE plpgsql
@@ -401,20 +407,37 @@ DECLARE
 	v_nidoperador operador.nidoperador%type;
 BEGIN
 	BEGIN
+		/*INSERTA OPERADOR*/
 		INSERT INTO public.operador
 		(bactivo, dfechanac, dfechareg, nidsesion, sapematerno, sapepaterno, sgenero, snombre, snumdocu, sobservacion)
 		VALUES(true, p_fechanac, now(), p_idsesion, p_apematerno, p_apepaterno, p_genero, p_nombre, p_numdocu, p_observacion)
 		RETURNING nidoperador INTO v_nidoperador;
 	
+		/*INSERTA USUARIO	*/
 		INSERT INTO public.usuario
 		(nidusuario, bactivo, dfechareg, nidsesion, slogin, spassword)
 		VALUES(v_nidoperador, true, now(), p_idsesion, p_login, p_password);
 		
+		/*INSERTA USUARIO ROL*/
+		INSERT INTO public.usuario_rol
+		(nidusuario, nidrol, sobservacion, bactivo, dfechareg, nidsesion)
+		VALUES(v_nidoperador, p_nidrol, '', TRUE, now(), p_idsesion);
+
+		/*INSERTA INSERTA USUARIO PERFIL*/
+		INSERT INTO public.usuario_perfil
+		(nidusuario, nidperfil, sobservacion, bactivo, dfechareg, nidsesion)
+		VALUES(v_nidoperador, p_nidperfil, '', TRUE, now(), p_idsesion);
+
+		/*INSERTA INSERTA USUARIO AREA*/
+		INSERT INTO public.usuario_area
+		(nidarea, sobservacion, nidusuario, bactivo, dfechareg, nidsesion)
+		VALUES(p_nidarea, '', v_nidoperador, TRUE ,  now(), p_idsesion);
+
 	
-		v_respuesta	:= 'Se insertó registro Operador correctamente';	
+		v_respuesta	:= 'Se registró Operador correctamente';	
 	EXCEPTION 
 		WHEN NO_DATA_FOUND THEN 
-		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_operador_usuario --'||SUBSTR(SQLERRM,1,200);
+		 v_respuesta := 'No se encontró registro en la funcion fn_insertar_operador_usuario --'||SUBSTR(SQLERRM,1,200);	
 		 WHEN OTHERS THEN 
 		 v_respuesta := 'Error en fn_insertar_operador_usuario --'||SUBSTR(SQLERRM,1,200);
 	END;
@@ -422,6 +445,8 @@ BEGIN
 END
 $function$
 ;
+
+
 
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
