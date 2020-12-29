@@ -202,3 +202,11 @@ VALUES (    TRUE,  NOW(),  NULL,  'SISTEMA VENTAS',  'V 1.0.0');
 
 
 
+/*TIPO DOCUMENTO*/
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('DNI', 'DNI', true, now(), 1);
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('CEE', 'CARNE DE EXTRANJERÍA', true, now(), 1);
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('PAS', 'PASAPORTE', true, now(), 1);
+
+
+
+

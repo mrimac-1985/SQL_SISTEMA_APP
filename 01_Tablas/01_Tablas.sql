@@ -56,19 +56,38 @@ CREATE TABLE public.modulo (
 
 CREATE TABLE public.operador (
 	nidoperador serial NOT NULL,
+	sidtipodoc varchar(5) NOT NULL,
 	snumdocu varchar(15) NOT NULL,
 	snombre varchar(80) NOT NULL,
 	sapepaterno varchar(80) NOT NULL,	
 	sapematerno varchar(80) NOT NULL,
-	scorreo varchar(80) NOT NULL,
+	scorreo varchar(80) NULL,
 	sgenero varchar(1) NOT NULL,
+	stelefono varchar(100) NULL,
 	dfechanac date NOT NULL,
 	sdireccion varchar(500) NULL,
 	sobservacion varchar(500) NULL,
 	bactivo bool NOT NULL,
 	dfechareg timestamp NOT NULL,
 	nidsesion int4 NULL,
-	CONSTRAINT pk_operador  PRIMARY KEY (nidoperador)
+	CONSTRAINT pk_operador  PRIMARY KEY (nidoperador),
+	CONSTRAINT fk_operador_sidtipodoc_tipodocumento_sidtipodoc FOREIGN KEY (sidtipodoc) REFERENCES tipodocumento(sidtipodoc)
+);
+
+
+-- public.tipodocumento definition
+
+-- Drop table
+
+-- DROP TABLE public.tipodocumento;
+
+CREATE TABLE public.tipodocumento (	
+	sidtipodoc varchar(5) NOT NULL,
+	sdescripcion varchar(50) NOT NULL,	 
+	bactivo bool NOT NULL,
+	dfechareg timestamp NOT NULL,
+	nidsesion int4 NULL,
+	CONSTRAINT pk_tipodocumento  PRIMARY KEY (sidtipodoc)
 );
 
 
