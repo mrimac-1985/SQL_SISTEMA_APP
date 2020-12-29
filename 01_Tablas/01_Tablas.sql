@@ -47,6 +47,20 @@ CREATE TABLE public.modulo (
 	CONSTRAINT pk_modulo PRIMARY KEY (nidmodulo)
 );
 
+-- public.tipodocumento definition
+
+-- Drop table
+
+-- DROP TABLE public.tipodocumento;
+
+CREATE TABLE public.tipodocumento (	
+	sidtipodoc varchar(5) NOT NULL,
+	sdescripcion varchar(50) NOT NULL,	 
+	bactivo bool NOT NULL,
+	dfechareg timestamp NOT NULL,
+	nidsesion int4 NULL,
+	CONSTRAINT pk_tipodocumento  PRIMARY KEY (sidtipodoc)
+);
 
 -- public.operador definition
 
@@ -75,20 +89,6 @@ CREATE TABLE public.operador (
 );
 
 
--- public.tipodocumento definition
-
--- Drop table
-
--- DROP TABLE public.tipodocumento;
-
-CREATE TABLE public.tipodocumento (	
-	sidtipodoc varchar(5) NOT NULL,
-	sdescripcion varchar(50) NOT NULL,	 
-	bactivo bool NOT NULL,
-	dfechareg timestamp NOT NULL,
-	nidsesion int4 NULL,
-	CONSTRAINT pk_tipodocumento  PRIMARY KEY (sidtipodoc)
-);
 
 
 -- public.parametro definition

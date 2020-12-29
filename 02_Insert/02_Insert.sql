@@ -5,7 +5,7 @@ VALUES (   TRUE,  now(),   'Jr. las avenidas con Jirones',  'CENTRAL',  '140000'
 
 /*AREA*/
 INSERT INTO  public.area(  bactivo,  dfechareg,   nidsesion,  snombre,  sobservacion,  nidsede)
-VALUES (  TRUE,   NOW(),   1,  'AdministraciÃ³n',  'Data para pruebas unitarias del sistema',  1);
+VALUES (  TRUE,   NOW(),   1,  'Administración',  'Data para pruebas unitarias del sistema',  1);
 
 INSERT INTO  public.area(  bactivo,  dfechareg,   nidsesion,  snombre,  sobservacion,  nidsede)
 VALUES (  TRUE,   NOW(),   1,  'Ventas',  'Data para pruebas unitarias del sistema',  1);
@@ -14,7 +14,7 @@ INSERT INTO  public.area(  bactivo,  dfechareg,   nidsesion,  snombre,  sobserva
 VALUES (  TRUE,   NOW(),   1,  'Recursos Humanos',  'Data para pruebas unitarias del sistema',  1);
 
 INSERT INTO  public.area(  bactivo,  dfechareg,   nidsesion,  snombre,  sobservacion,  nidsede)
-VALUES (  TRUE,   NOW(),   1,  'LogÃ­stica',  'Data para pruebas unitarias del sistema',  1);
+VALUES (  TRUE,   NOW(),   1,  'Logística',  'Data para pruebas unitarias del sistema',  1);
 
 INSERT INTO  public.area(  bactivo,  dfechareg,   nidsesion,  snombre,  sobservacion,  nidsede)
 VALUES (  TRUE,   NOW(),   1,  'Comtabilidad',  'Data para pruebas unitarias del sistema',  1);
@@ -74,7 +74,7 @@ INSERT INTO   public.submenu(   siconomenu, norden,  snombremenu,  surl,  nidmen
 VALUES ( 'portrait',4,  'Perfil',  '/perfil',  2);
 
 INSERT INTO   public.submenu(   siconomenu, norden,  snombremenu,  surl,  nidmenu)
-VALUES ( 'menu',5,  'MenÃº',  '/menu',  2);
+VALUES ( 'menu',5,  'Menú',  '/menu',  2);
 
 INSERT INTO   public.submenu(   siconomenu, norden,  snombremenu,  surl,  nidmenu)
 VALUES ( 'menu',6,  'Area',  '/area',  2);
@@ -127,27 +127,43 @@ INSERT INTO   public.menu_rol(  bactivo,  dfechareg,  nidrol,  nidmenu)
 VALUES (  TRUE,  now(),  2,  3);
 
 
+
+/*TIPO DOCUMENTO*/
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('DNI', 'DNI', true, now(), 1);
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('CEE', 'CARNE DE EXTRANJERÍA', true, now(), 1);
+INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('PAS', 'PASAPORTE', true, now(), 1);
+
+TRUNCATE TABLE operador  RESTART IDENTITY CASCADE;
+TRUNCATE TABLE usuario RESTART IDENTITY CASCADE;
+
+SELECT * from operador
+
 /*USUARIOS*/
-INSERT INTO   public.operador(    bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
-VALUES (   TRUE,  NOW(),  NOW(),  1,  'RIMAC',  'AYALA',  'M',  'MAXIMO',  '43449994',  '');
+INSERT INTO   public.operador( sidtipodoc,   bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
+VALUES ( 'DNI',  TRUE,  NOW(),  NOW(),  1,  'RIMAC',  'AYALA',  'M',  'MAXIMO',  '43449994',  '');
 INSERT INTO   public.usuario(  nidusuario, bactivo,  dfechareg,  nidsesion,  slogin,  spassword)
 VALUES ( 1, TRUE,  NOW(), 1 ,  'MAX',  '123');
 
 
-INSERT INTO   public.operador(    bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
-VALUES (   TRUE,  NOW(),  NOW(),  1,  'RIMAC',  'AYALA',  'M',  'TONY',  '43449994',  '');
-INSERT INTO   public.usuario(  nidusuario, bactivo,  dfechareg,  nidsesion,  slogin,  spassword)
+INSERT INTO   public.operador(  sidtipodoc,  bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
+VALUES (  'DNI',  TRUE,  NOW(),  NOW(),  1,  'RIMAC',  'AYALA',  'M',  'TONY',  '43449994',  '');
+INSERT INTO   public.usuario( nidusuario, bactivo,  dfechareg,  nidsesion,  slogin,  spassword)
 VALUES ( 2, TRUE,  NOW(), 1 ,  'TONY',  '123');
 
-INSERT INTO   public.operador(    bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
-VALUES (   TRUE,  NOW(),  NOW(),  1,  'ADMIN',  'ADMIN',  'M',  'ADMIN',  '11111111',  '');
+
+INSERT INTO   public.operador( sidtipodoc,   bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
+VALUES ( 'DNI',  TRUE,  NOW(),  NOW(),  1,  'ADMIN',  'ADMIN',  'M',  'ADMIN',  '11111111',  '');
 INSERT INTO   public.usuario(  nidusuario, bactivo,  dfechareg,  nidsesion,  slogin,  spassword)
 VALUES ( 3, TRUE,  NOW(), 1 ,  'ADMIN',  '123');
 
-INSERT INTO   public.operador(    bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
-VALUES (   TRUE,  NOW(),  NOW(),  1,  'ROOT',  'ROOT',  'M',  'ROOT',  '00000000',  '');
+
+
+INSERT INTO   public.operador(  sidtipodoc,  bactivo,  dfechanac,  dfechareg,  nidsesion,  sapematerno,  sapepaterno,  sgenero,  snombre,  snumdocu,  sobservacion)
+VALUES ( 'DNI',   TRUE,  NOW(),  NOW(),  1,  'ROOT',  'ROOT',  'M',  'ROOT',  '00000000',  '');
 INSERT INTO   public.usuario(  nidusuario, bactivo,  dfechareg,  nidsesion,  slogin,  spassword)
 VALUES ( 4, TRUE,  NOW(), 1 ,  'ROOT',  '123');
+ 
+
 
 
 /*USAURIO AREA*/
@@ -200,12 +216,6 @@ VALUES (  true,  now(),  'NOMB_TIENDA',  'Nombre de la tienda',  'SISTEMA DE VEN
 INSERT INTO   public.info_sistema(    bactivo,  dfechareg,  slogo,  snombresistema,  sversion)
 VALUES (    TRUE,  NOW(),  NULL,  'SISTEMA VENTAS',  'V 1.0.0');
 
-
-
-/*TIPO DOCUMENTO*/
-INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('DNI', 'DNI', true, now(), 1);
-INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('CEE', 'CARNE DE EXTRANJERÍA', true, now(), 1);
-INSERT INTO public.tipodocumento (sidtipodoc, sdescripcion, bactivo, dfechareg, nidsesion) VALUES('PAS', 'PASAPORTE', true, now(), 1);
 
 
 
