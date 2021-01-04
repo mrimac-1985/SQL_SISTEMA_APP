@@ -27,6 +27,7 @@ BEGIN
 				bactivo = FALSE
 			WHERE 
 				nidoperador = p_nidoperador;
+			
 			/*ELIMINA USUARIO*/
 			UPDATE 
 				public.usuario
@@ -35,7 +36,10 @@ BEGIN
 			WHERE 
 				nidusuario = p_nidoperador;
 			
-			v_respuesta	:= 'Se eliminó correctamente';
+			/*REGISTRAR AUDITORIA*/
+			
+			
+			v_respuesta	:= 'Se eliminó operador correctamente';
 		END IF;
 	EXCEPTION 
 		 WHEN NO_DATA_FOUND THEN 
