@@ -356,6 +356,25 @@ CREATE TABLE public.sesion (
 	CONSTRAINT fk_sesion_nidusuario_usuario_nidusuario FOREIGN KEY (nidusuario) REFERENCES usuario(nidusuario)
 );
 
+-- public.Ubigeo definition
+
+-- Drop table
+
+-- DROP TABLE public.Ubigeo;
+
+CREATE TABLE Ubigeo(
+	sIdUbigeo CHAR(6) NOT NULL,
+	sNombre VARCHAR(50) NOT NULL,
+	sCodAnterior CHAR(6) NULL,
+	bActivo bool NOT NULL,
+	nIdSesion INT NOT NULL,
+	dFechaHoraAud timestamp NOT NULL
+);
+
+ALTER TABLE ubigeo ADD CONSTRAINT Ubigeo_pk PRIMARY key(sIdUbigeo);
+
+
+
 
 /*tablas para el tocken*/
 
@@ -376,3 +395,4 @@ create table oauth_refresh_token (
   token bytea,
   authentication bytea
 );
+
