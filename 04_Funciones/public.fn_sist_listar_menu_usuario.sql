@@ -32,7 +32,8 @@ BEGIN
 			  INNER JOIN public.menu_rol ON (public.rol.nidrol = public.menu_rol.nidrol) 
 			  INNER JOIN public.menu ON (public.menu_rol.nidmenu = public.menu.nidmenu) 
 			  INNER JOIN public.submenu ON (public.submenu.nidmenu =public.menu.nidmenu)
-			WHERE UPPER(public.usuario.slogin)= UPPER(p_usuario); 
+			WHERE UPPER(public.usuario.slogin)= UPPER(p_usuario)
+			ORDER BY public.menu.norden , public.submenu.norden ASC; 
 END
 $function$
 ;
