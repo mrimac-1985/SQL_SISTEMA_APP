@@ -31,7 +31,7 @@ BEGIN
 			SET 
 				nidsesion= p_idsesion, 
 				snombre = p_nombre, 
-				sobservacion= p_observacion, 
+				sobservacion= p_sobservacion, 
 				nidsede = p_idsede
 			WHERE 
 				nidarea = p_idarea;
