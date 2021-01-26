@@ -70,8 +70,3 @@ $function$
 ;
 
 
-
-SELECT * FROM menu WHERE nidmenu = 2
-
-UPDATE menu SET snombremenu='Configuración' 
-WHERE nidmenu = 2
