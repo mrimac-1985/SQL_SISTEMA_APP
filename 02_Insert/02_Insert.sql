@@ -79,6 +79,8 @@ VALUES ( 'menu',5,  'Menú',  '/menu',  2);
 INSERT INTO   public.submenu(   siconomenu, norden,  snombremenu,  surl,  nidmenu)
 VALUES ( 'menu',6,  'Area',  '/area',  2);
 
+INSERT INTO public.submenu ( norden, snombremenu, siconomenu, surl, nidmenu)
+VALUES( 7, 'Roles', 'device_hub', '/roles', 2);
 
 /*Reportes*/
 
